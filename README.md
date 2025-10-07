@@ -30,7 +30,7 @@ Acara ini bebas untuk siapa saja baik untuk pemula hingga professional sekalipun
 
 ### Bagaimana cara berkontribusi di Repository ini? 
 * Tambahkan File apapun yang kalian punya
-* Setelah ditambahkan silahkan klik pu request, tunggu sampai saya acc
+* Setelah ditambahkan silahkan klik pul request, tunggu sampai saya acc
 
 ------ 
 
