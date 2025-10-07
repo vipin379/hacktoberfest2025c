@@ -1,0 +1,2 @@
+/ip firewall nat
+add chain=srcnat src-address=192.168.18.0/24 dst-address=192.168.66.1 action=masquerade

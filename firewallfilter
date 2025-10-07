@@ -1,0 +1,2 @@
+/ip firewall filter
+add chain=input src-address=192.168.18.0/24 action=accept comment="Allow akses dari ISP rumah"
