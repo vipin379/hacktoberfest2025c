@@ -1,0 +1,68 @@
+import { Github, Linkedin, Mail, ArrowDown } from 'lucide-react';
+
+export default function Hero() {
+  const scrollToSection = (id: string) => {
+    const element = document.getElementById(id);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
+  return (
+    <section
+      id="home"
+      className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-white to-cyan-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 pt-16 transition-colors"
+    >
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+        <div className="text-center">
+
+          {/* Bagian avatar (huruf A & lingkaran) sudah dihapus */}
+
+          <h1 className="text-5xl md:text-7xl font-bold text-gray-900 dark:text-white mb-6">
+            Hi, I'm{" "}
+            <span className="bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
+              Aranda Ilham Zubair
+            </span>
+          </h1>
+
+          <p className="text-xl md:text-2xl text-gray-600 dark:text-gray-300 mb-4">
+            Electrical Engineering Student At Al Azhar University Indonesia | R&D Intern at Pasifik Satelit Nusantara | Cryptocurrency & Blockchain Enthusiast | IoT, Robotic, & Artificial Intelligence
+          </p>
+
+          <div className="flex justify-center gap-4 mb-12">
+            <a
+              href="https://github.com/yaelahaiz"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="p-3 rounded-full bg-gray-900 dark:bg-gray-700 text-white hover:bg-gray-800 dark:hover:bg-gray-600 transition-colors shadow-lg hover:shadow-xl transform hover:-translate-y-1 duration-200"
+            >
+              <Github size={24} />
+            </a>
+            <a
+              href="https://www.linkedin.com/in/aranda-ilham-zubair/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="p-3 rounded-full bg-blue-600 text-white hover:bg-blue-700 transition-colors shadow-lg hover:shadow-xl transform hover:-translate-y-1 duration-200"
+            >
+              <Linkedin size={24} />
+            </a>
+            <a
+              href="mailto:arandailhamzubair@gmail.com"
+              className="p-3 rounded-full bg-cyan-600 text-white hover:bg-cyan-700 transition-colors shadow-lg hover:shadow-xl transform hover:-translate-y-1 duration-200"
+            >
+              <Mail size={24} />
+            </a>
+          </div>
+
+          <button
+            onClick={() => scrollToSection('about')}
+            className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-blue-600 to-cyan-600 text-white rounded-full font-medium hover:shadow-xl transform hover:-translate-y-1 transition-all duration-200"
+          >
+            Learn More
+            <ArrowDown size={20} />
+          </button>
+        </div>
+      </div>
+    </section>
+  );
+}
