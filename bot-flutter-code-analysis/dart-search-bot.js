@@ -492,6 +492,15 @@ async function startRepl(index) {
   })
 }
 
+function writeCSV(filePath, rows) {
+  try {
+    fs.writeFileSync(filePath, toCSV(rows), "utf8")
+    console.log("CSV disimpan ke", filePath)
+  } catch (e) {
+    console.error("Gagal menulis CSV:", e.message)
+  }
+}
+
 // CLI entrypoint
 ;(function main() {
   const args = process.argv.slice(2)
@@ -558,6 +567,17 @@ async function startRepl(index) {
       process.exit(1)
     }
     resultsForOutput = findResults // Prioritaskan hasil find bila ada
+  }
+
+  // --csv <file>
+  const csvIdx = flags.indexOf("--csv")
+  if (csvIdx !== -1 && flags[csvIdx + 1]) {
+    const csvOut = flags[csvIdx + 1]
+    // Jika belum ada sumber, default ke list all
+    if (!resultsForOutput) resultsForOutput = listAll(index, "all")
+    writeCSV(csvOut, resultsForOutput)
+    // Jika hanya CSV (tanpa --list/--find), selesai di sini
+    if (listIdx === -1 && findIdx === -1) return
   }
 
   // Jika ada --list tanpa --find, cetak list
