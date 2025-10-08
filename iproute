@@ -1,0 +1,2 @@
+/ip route
+add dst-address=192.168.18.0/24 gateway=<gateway_ISP_rumah>
