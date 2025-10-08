@@ -1,0 +1,250 @@
+#!/usr/bin/env python3
+"""
+Flask REST API untuk SNMP Agent
+Menghubungkan Web Dashboard dengan SNMP Agent
+"""
+
+from flask import Flask, jsonify, request
+from flask_cors import CORS
+from pysnmp.hlapi import *
+import time
+
+app = Flask(__name__)
+CORS(app)  # Enable CORS untuk komunikasi dengan React
+
+# ==================== KONFIGURASI SNMP ====================
+SNMP_HOST = '127.0.0.1'
+SNMP_PORT = 16100
+SNMP_COMMUNITY = 'public'
+
+# Mapping OID
+OIDS = {
+    'sysDescr': '1.3.6.1.2.1.1.1.0',
+    'sysName': '1.3.6.1.2.1.1.5.0',
+    'sysLocation': '1.3.6.1.2.1.1.6.0',
+    'sysContact': '1.3.6.1.2.1.1.4.0',
+    'sysUptime': '1.3.6.1.2.1.1.3.0',
+    'deviceName': '1.3.6.1.4.1.53864.1.0',
+    'voltageX100': '1.3.6.1.4.1.53864.10.1.0',
+    'currentX1000': '1.3.6.1.4.1.53864.10.2.0',
+    'temperatureX10': '1.3.6.1.4.1.53864.20.1.0',
+    'relayState': '1.3.6.1.4.1.53864.30.1.0'
+}
+
+# ==================== HELPER FUNCTIONS ====================
+def snmp_get(oid):
+    """Perform SNMP GET request"""
+    try:
+        iterator = getCmd(
+            SnmpEngine(),
+            CommunityData(SNMP_COMMUNITY, mpModel=1),  # SNMPv2c
+            UdpTransportTarget((SNMP_HOST, SNMP_PORT), timeout=2, retries=1),
+            ContextData(),
+            ObjectType(ObjectIdentity(oid))
+        )
+        
+        errorIndication, errorStatus, errorIndex, varBinds = next(iterator)
+        
+        if errorIndication:
+            print(f"Error: {errorIndication}")
+            return None
+        elif errorStatus:
+            print(f"Error: {errorStatus.prettyPrint()}")
+            return None
+        else:
+            for varBind in varBinds:
+                return varBind[1].prettyPrint()
+    except Exception as e:
+        print(f"Exception during SNMP GET: {e}")
+        return None
+
+def snmp_set(oid, value, value_type='Integer'):
+    """Perform SNMP SET request"""
+    try:
+        # Tentukan tipe data berdasarkan value_type
+        if value_type == 'Integer':
+            snmp_value = Integer(value)
+        elif value_type == 'OctetString':
+            snmp_value = OctetString(value)
+        else:
+            snmp_value = Integer(value)
+        
+        iterator = setCmd(
+            SnmpEngine(),
+            CommunityData(SNMP_COMMUNITY, mpModel=1),  # SNMPv2c
+            UdpTransportTarget((SNMP_HOST, SNMP_PORT), timeout=2, retries=1),
+            ContextData(),
+            ObjectType(ObjectIdentity(oid), snmp_value)
+        )
+        
+        errorIndication, errorStatus, errorIndex, varBinds = next(iterator)
+        
+        if errorIndication:
+            print(f"Error: {errorIndication}")
+            return False
+        elif errorStatus:
+            print(f"Error: {errorStatus.prettyPrint()}")
+            return False
+        else:
+            return True
+    except Exception as e:
+        print(f"Exception during SNMP SET: {e}")
+        return False
+
+# ==================== API ENDPOINTS ====================
+
+@app.route('/', methods=['GET'])
+def index():
+    """Root endpoint - API documentation"""
+    return jsonify({
+        'name': 'SNMP Agent REST API',
+        'version': '1.0.0',
+        'status': 'running',
+        'endpoints': {
+            'health': '/api/health',
+            'get_all_data': '/api/snmp/data',
+            'relay_control': '/api/snmp/relay',
+            'get_specific': '/api/snmp/get/<oid_name>'
+        },
+        'documentation': 'Available endpoints listed above'
+    })
+
+@app.route('/api/health', methods=['GET'])
+def health_check():
+    """Check if API is running"""
+    return jsonify({
+        'status': 'ok',
+        'message': 'SNMP API is running',
+        'timestamp': time.time()
+    })
+
+@app.route('/api/snmp/data', methods=['GET'])
+def get_all_data():
+    """Get all SNMP data"""
+    try:
+        data = {}
+        
+        # Ambil semua data dari SNMP Agent
+        for key, oid in OIDS.items():
+            value = snmp_get(oid)
+            if value is not None:
+                # Convert ke integer untuk nilai numerik
+                if key in ['voltageX100', 'currentX1000', 'temperatureX10', 'relayState']:
+                    try:
+                        data[key] = int(value)
+                    except:
+                        data[key] = value
+                elif key == 'sysUptime':
+                    try:
+                        # Convert TimeTicks to seconds
+                        data[key] = int(value) / 100.0
+                    except:
+                        data[key] = 0
+                else:
+                    data[key] = value
+            else:
+                data[key] = None
+        
+        # Tambahkan timestamp
+        data['lastUpdate'] = int(time.time() * 1000)  # milliseconds
+        data['connected'] = True
+        
+        return jsonify(data)
+    
+    except Exception as e:
+        return jsonify({
+            'error': str(e),
+            'connected': False
+        }), 500
+
+@app.route('/api/snmp/relay', methods=['GET', 'POST'])
+def relay_control():
+    """Get or Set relay state"""
+    
+    if request.method == 'GET':
+        # GET current relay state
+        value = snmp_get(OIDS['relayState'])
+        if value is not None:
+            return jsonify({
+                'relayState': int(value),
+                'success': True
+            })
+        else:
+            return jsonify({
+                'error': 'Failed to get relay state',
+                'success': False
+            }), 500
+    
+    elif request.method == 'POST':
+        # SET relay state
+        data = request.get_json()
+        new_state = data.get('state')
+        
+        if new_state not in [0, 1]:
+            return jsonify({
+                'error': 'Invalid state. Must be 0 or 1',
+                'success': False
+            }), 400
+        
+        success = snmp_set(OIDS['relayState'], new_state, 'Integer')
+        
+        if success:
+            return jsonify({
+                'relayState': new_state,
+                'success': True,
+                'message': f"Relay turned {'ON' if new_state == 1 else 'OFF'}"
+            })
+        else:
+            return jsonify({
+                'error': 'Failed to set relay state',
+                'success': False
+            }), 500
+
+@app.route('/api/snmp/get/<oid_name>', methods=['GET'])
+def get_specific_oid(oid_name):
+    """Get specific OID value"""
+    if oid_name not in OIDS:
+        return jsonify({
+            'error': f'Unknown OID: {oid_name}',
+            'available_oids': list(OIDS.keys())
+        }), 404
+    
+    value = snmp_get(OIDS[oid_name])
+    
+    if value is not None:
+        return jsonify({
+            'oid': oid_name,
+            'value': value,
+            'success': True
+        })
+    else:
+        return jsonify({
+            'error': f'Failed to get {oid_name}',
+            'success': False
+        }), 500
+
+# ==================== MAIN ====================
+if __name__ == '__main__':
+    print("\n" + "="*60)
+    print("  Flask REST API for SNMP Agent")
+    print("="*60)
+    print(f"\n🌐 API Server: http://localhost:5000")
+    print(f"📡 SNMP Agent: {SNMP_HOST}:{SNMP_PORT}")
+    print(f"🔑 Community: {SNMP_COMMUNITY}")
+    print("\n" + "="*60)
+    print("  Available Endpoints:")
+    print("="*60)
+    print("\n  GET  /api/health")
+    print("  GET  /api/snmp/data")
+    print("  GET  /api/snmp/relay")
+    print("  POST /api/snmp/relay")
+    print("  GET  /api/snmp/get/<oid_name>")
+    print("\n" + "="*60)
+    print("  Test with curl:")
+    print("="*60)
+    print("\n  curl http://localhost:5000/api/health")
+    print("  curl http://localhost:5000/api/snmp/data")
+    print("  curl -X POST http://localhost:5000/api/snmp/relay -H 'Content-Type: application/json' -d '{\"state\": 1}'")
+    print("\n" + "="*60 + "\n")
+    
+    app.run(host='0.0.0.0', port=5000, debug=True)
