@@ -501,6 +501,15 @@ function writeCSV(filePath, rows) {
   }
 }
 
+function writeJSON(filePath, data) {
+  try {
+    fs.writeFileSync(filePath, JSON.stringify(data, null, 2), "utf8")
+    console.log("JSON disimpan ke", filePath)
+  } catch (e) {
+    console.error("Gagal menulis JSON:", e.message)
+  }
+}
+
 // CLI entrypoint
 ;(function main() {
   const args = process.argv.slice(2)
@@ -578,6 +587,15 @@ function writeCSV(filePath, rows) {
     writeCSV(csvOut, resultsForOutput)
     // Jika hanya CSV (tanpa --list/--find), selesai di sini
     if (listIdx === -1 && findIdx === -1) return
+  }
+
+  // --json <file>
+  const jsonIdx = flags.indexOf("--json")
+  if (jsonIdx !== -1 && flags[jsonIdx + 1]) {
+    const jsonOut = flags[jsonIdx + 1]
+    writeJSON(jsonOut, index) // menyimpan indeks penuh
+    // Jika hanya JSON (tanpa --list/--find/--csv), selesai di sini
+    if (listIdx === -1 && findIdx === -1 && csvIdx === -1) return
   }
 
   // Jika ada --list tanpa --find, cetak list
