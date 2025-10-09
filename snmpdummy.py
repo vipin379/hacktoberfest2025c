@@ -4,6 +4,8 @@ from pysnmp.entity.rfc3413 import cmdrsp, context
 from pysnmp.proto.api import v2c
 
 # Dummy data
+
+#hacktoberfest2025
 data = {
     '1.3.6.1.4.1.53864.10.1.0': 23050,
     '1.3.6.1.4.1.53864.10.2.0': 1234,
