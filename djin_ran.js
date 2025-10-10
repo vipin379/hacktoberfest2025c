@@ -29,7 +29,7 @@ function randomCode(len=5) {
 
 // endpoint untuk tombol G: kembalikan IP client + random code
 app.get('/api/generate-sample', (req,res) => {
-  // dapatkan IP dari header (X-Forwarded-For) atau socket
+  // dapatkan IP dari header (X-Forwarded-For) atau socket okesob
   let ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress || req.socket.remoteAddress || '';
   // jika ip format ::ffff:192.168.x.x -> normalisasi
   if (ip.startsWith('::ffff:')) ip = ip.split('::ffff:')[1];
