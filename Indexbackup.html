@@ -589,7 +589,7 @@ function exportCSV(){
 
       // init timeWindowMinutes from persisted value
       const tw=document.getElementById('time-window').value; fsOptions.timeWindowMinutes = parseInt(tw||'15',10) || 0;
-
+// hacktoberfest2025
       const wait=setInterval(()=>{
         if(window.isFirebaseReady && window.db){
           clearInterval(wait);
