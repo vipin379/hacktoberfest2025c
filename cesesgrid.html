@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CSS Grid Sederhana</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    .grid-container {
+      display: grid;
+      grid-template-areas:
+        "header header"
+        "sidebar content"
+        "footer footer";
+      grid-template-columns: 200px 1fr;
+      grid-template-rows: auto 1fr auto;
+      height: 100vh;
+    }
+
+    header {
+      grid-area: header;
+      background-color: #333;
+      color: white;
+      padding: 1rem;
+      text-align: center;
+    }
+
+    aside {
+      grid-area: sidebar;
+      background-color: #f4f4f4;
+      padding: 1rem;
+      border-right: 1px solid #ddd;
+    }
+
+    main {
+      grid-area: content;
+      padding: 1rem;
+    }
+
+    footer {
+      grid-area: footer;
+      background-color: #333;
+      color: white;
+      text-align: center;
+      padding: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="grid-container">
+    <header>
+      <h1>Header</h1>
+    </header>
+    <aside>
+      <h2>Sidebar</h2>
+      <p>Menu atau navigasi di sini.</p>
+    </aside>
+    <main>
+      <h2>Konten Utama</h2>
+      <p>Ini adalah bagian konten utama dari halaman.</p>
+    </main>
+    <footer>
+      <p>&copy; 2025 Footer Sederhana</p>
+    </footer>
+  </div>
+</body>
+</html>
