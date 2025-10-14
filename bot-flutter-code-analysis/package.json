@@ -1,0 +1,16 @@
+{
+  "name": "bot-flutter-code-analysis",
+  "version": "1.0.0",
+  "description": "CLI Node.js untuk mengindeks dan mencari **class**, **method**, dan **top-level function** di proyek Dart/Flutter.",
+  "main": "dart-search-bot.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@cerebras/cerebras_cloud_sdk": "^1.50.0",
+    "openai": "^6.3.0"
+  }
+}
