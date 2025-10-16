@@ -183,7 +183,7 @@ Menggunakan `--json <file.json>`, tool menulis indeks seperti:
 
 - **Discovery**: Rekursif memindai `lib/` untuk file `*.dart` (mengabaikan `.git`, `build`, dsb).
 - **Parsing**: Menggunakan regex + pencocokan kurung untuk mengenali:
-  - `class Foo { ... }`
+  - `class Bar { ... }`
   - method di dalam class
   - top‑level function (termasuk arrow function `=>`)
 - **Posisi**: Menghitung `start_line` & `end_line` memakai indeks awal baris dan posisi kurung kurawal yang cocok.
