@@ -1,0 +1,52 @@
+body {
+    background-color: #1e293b;
+    color: #e2e8f0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+}
+
+.profile-card {
+    background: #334155;
+    border-radius: 15px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    padding: 30px;
+    max-width: 350px;
+    text-align: center;
+}
+
+.profile-img {
+    width: 120px;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 3px solid #64748b;
+    margin-bottom: 15px;
+}
+
+.skills ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.skills li {
+    background-color: #475569;
+    margin: 5px 0;
+    padding: 8px;
+    border-radius: 8px;
+}
+
+.contact a {
+    display: inline-block;
+    margin: 10px 8px 0 8px;
+    color: #cbd5e1;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.contact a:hover {
+    color: #7dd3fc;
+}
