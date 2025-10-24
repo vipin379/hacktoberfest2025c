@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Tebak Gambar</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 40px;
+            max-width: 800px;
+            width: 100%;
+        }
+
+        h1 {
+            text-align: center;
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px 0;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 10px;
+            color: white;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        .stat-value {
+            font-size: 1.8em;
+            font-weight: bold;
+            margin-top: 5px;
+        }
+
+        .game-area {
+            margin: 30px 0;
+        }
+
+        .image-container {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .game-image {
+            max-width: 100%;
+            height: 300px;
+            object-fit: contain;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            background: #f5f5f5;
+        }
+
+        .question {
+            text-align: center;
+            font-size: 1.3em;
+            color: #333;
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+
+        .options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .option-btn {
+            padding: 15px 25px;
+            font-size: 1.1em;
+            border: 2px solid #667eea;
+            background: white;
+            color: #667eea;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .option-btn:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .option-btn.correct {
+            background: #10b981;
+            color: white;
+            border-color: #10b981;
+        }
+
+        .option-btn.wrong {
+            background: #ef4444;
+            color: white;
+            border-color: #ef4444;
+        }
+
+        .option-btn:disabled {
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .feedback {
+            text-align: center;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-size: 1.1em;
+            font-weight: 500;
+            display: none;
+        }
+
+        .feedback.show {
+            display: block;
+        }
+
+        .feedback.correct {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .feedback.wrong {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .next-btn {
+            width: 100%;
+            padding: 15px;
+            font-size: 1.2em;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: transform 0.2s;
+            display: none;
+        }
+
+        .next-btn.show {
+            display: block;
+        }
+
+        .next-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .game-over {
+            text-align: center;
+            display: none;
+        }
+
+        .game-over.show {
+            display: block;
+        }
+
+        .game-over h2 {
+            color: #667eea;
+            font-size: 2em;
+            margin-bottom: 20px;
+        }
+
+        .final-score {
+            font-size: 3em;
+            color: #764ba2;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+
+        .restart-btn {
+            padding: 15px 40px;
+            font-size: 1.2em;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+
+        .restart-btn:hover {
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎮 Tebak Gambar</h1>
+        
+        <div class="stats">
+            <div class="stat-item">
+                <div class="stat-label">Soal</div>
+                <div class="stat-value" id="currentQuestion">1</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label">Skor</div>
+                <div class="stat-value" id="score">0</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label">Benar</div>
+                <div class="stat-value" id="correct">0</div>
+            </div>
+        </div>
+
+        <div class="game-area" id="gameArea">
+            <div class="image-container">
+                <img src="" alt="Gambar Tebakan" class="game-image" id="gameImage">
+            </div>
+            
+            <div class="question" id="question"></div>
+            
+            <div class="feedback" id="feedback"></div>
+            
+            <div class="options" id="options"></div>
+            
+            <button class="next-btn" id="nextBtn">Soal Berikutnya</button>
+        </div>
+
+        <div class="game-over" id="gameOver">
+            <h2>🎉 Permainan Selesai!</h2>
+            <div class="final-score" id="finalScore">0/0</div>
+            <p style="font-size: 1.2em; color: #666; margin: 20px 0;">Terima kasih sudah bermain!</p>
+            <button class="restart-btn" onclick="restartGame()">Main Lagi</button>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            {
+                image: "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=500",
+                question: "Hewan apa ini?",
+                options: ["Kucing", "Anjing", "Kelinci", "Hamster"],
+                correct: 0
+            },
+            {
+                image: "https://images.unsplash.com/photo-1546527868-ccb7ee7dfa6a?w=500",
+                question: "Buah apa ini?",
+                options: ["Jeruk", "Apel", "Mangga", "Pisang"],
+                correct: 3
+            },
+            {
+                image: "https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=500",
+                question: "Kendaraan apa ini?",
+                options: ["Sepeda", "Motor", "Mobil", "Pesawat"],
+                correct: 2
+            },
+            {
+                image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=500",
+                question: "Ini adalah jenis?",
+                options: ["Baju", "Celana", "Sepatu", "Topi"],
+                correct: 2
+            },
+            {
+                image: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=500",
+                question: "Apa ini?",
+                options: ["Minuman", "Makanan", "Buah", "Sayur"],
+                correct: 1
+            },
+            {
+                image: "https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=500",
+                question: "Apa yang terlihat di gambar?",
+                options: ["Gunung", "Pantai", "Hutan", "Danau"],
+                correct: 0
+            },
+            {
+                image: "https://images.unsplash.com/photo-1415604934674-561df9abf539?w=500",
+                question: "Ini adalah gambar?",
+                options: ["Hewan", "Tumbuhan", "Bangunan", "Alam"],
+                correct: 1
+            },
+            {
+                image: "https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=500",
+                question: "Warna dominan mobil ini?",
+                options: ["Hitam", "Putih", "Merah", "Biru"],
+                correct: 2
+            },
+            {
+                image: "https://images.unsplash.com/photo-1551963831-b3b1ca40c98e?w=500",
+                question: "Ini adalah gambar?",
+                options: ["Sayuran", "Buah", "Daging", "Roti"],
+                correct: 1
+            },
+            {
+                image: "https://images.unsplash.com/photo-1517849845537-4d257902454a?w=500",
+                question: "Hewan apa ini?",
+                options: ["Kucing", "Anjing", "Burung", "Ikan"],
+                correct: 1
+            }
+        ];
+
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let correctAnswers = 0;
+        let answered = false;
+
+        function loadQuestion() {
+            answered = false;
+            const q = questions[currentQuestionIndex];
+            
+            document.getElementById('gameImage').src = q.image;
+            document.getElementById('question').textContent = q.question;
+            document.getElementById('currentQuestion').textContent = currentQuestionIndex + 1;
+            document.getElementById('feedback').classList.remove('show');
+            document.getElementById('nextBtn').classList.remove('show');
+            
+            const optionsDiv = document.getElementById('options');
+            optionsDiv.innerHTML = '';
+            
+            q.options.forEach((option, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.textContent = option;
+                btn.onclick = () => checkAnswer(index);
+                optionsDiv.appendChild(btn);
+            });
+        }
+
+        function checkAnswer(selectedIndex) {
+            if (answered) return;
+            answered = true;
+
+            const q = questions[currentQuestionIndex];
+            const options = document.querySelectorAll('.option-btn');
+            const feedback = document.getElementById('feedback');
+            
+            options.forEach(btn => btn.disabled = true);
+            
+            if (selectedIndex === q.correct) {
+                options[selectedIndex].classList.add('correct');
+                feedback.textContent = '🎉 Benar! Jawaban Anda tepat!';
+                feedback.className = 'feedback correct show';
+                score += 10;
+                correctAnswers++;
+            } else {
+                options[selectedIndex].classList.add('wrong');
+                options[q.correct].classList.add('correct');
+                feedback.textContent = '❌ Salah! Jawaban yang benar: ' + q.options[q.correct];
+                feedback.className = 'feedback wrong show';
+            }
+            
+            document.getElementById('score').textContent = score;
+            document.getElementById('correct').textContent = correctAnswers;
+            document.getElementById('nextBtn').classList.add('show');
+        }
+
+        document.getElementById('nextBtn').onclick = function() {
+            currentQuestionIndex++;
+            
+            if (currentQuestionIndex < questions.length) {
+                loadQuestion();
+            } else {
+                showGameOver();
+            }
+        };
+
+        function showGameOver() {
+            document.getElementById('gameArea').style.display = 'none';
+            document.getElementById('gameOver').classList.add('show');
+            document.getElementById('finalScore').textContent = correctAnswers + '/' + questions.length;
+        }
+
+        function restartGame() {
+            currentQuestionIndex = 0;
+            score = 0;
+            correctAnswers = 0;
+            document.getElementById('score').textContent = '0';
+            document.getElementById('correct').textContent = '0';
+            document.getElementById('gameArea').style.display = 'block';
+            document.getElementById('gameOver').classList.remove('show');
+            loadQuestion();
+        }
+
+        // Load first question
+        loadQuestion();
+    </script>
+</body>
+</html>
